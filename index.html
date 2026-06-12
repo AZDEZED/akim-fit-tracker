@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1f8f5f" />
+  <link rel="manifest" href="manifest.json" />
+  <title>Akim Fit Tracker</title>
+  <style>
+    :root {
+      --bg:#f4f7f5; --card:#fff; --text:#1f2933; --muted:#6b7280;
+      --green:#1f8f5f; --green-dark:#156b46; --orange:#f97316;
+      --red:#dc2626; --line:#e5e7eb; --soft:#eef7f1;
+      --shadow:0 8px 24px rgba(15,23,42,.08); --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+    header{background:linear-gradient(135deg,var(--green),var(--green-dark));color:white;padding:22px 18px 30px;border-bottom-left-radius:28px;border-bottom-right-radius:28px;box-shadow:var(--shadow)}
+    header h1{margin:0;font-size:1.75rem;letter-spacing:-.04em}
+    header p{margin:5px 0 0;opacity:.92}
+    main{max-width:900px;margin:-18px auto 80px;padding:0 14px}
+    .card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:14px;box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.7)}
+    h2{margin:0 0 12px;font-size:1.16rem}
+    h3{margin:14px 0 8px;font-size:1rem}
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .stat{background:#f9fafb;border:1px solid var(--line);border-radius:14px;padding:12px}
+    .label{color:var(--muted);font-size:.78rem}
+    .value{font-size:1.35rem;font-weight:850;margin-top:3px}
+    .progress-wrap{background:#e5e7eb;height:16px;border-radius:999px;overflow:hidden;margin-top:8px}
+    .progress-bar{height:100%;background:linear-gradient(90deg,var(--orange),var(--green));width:0%;border-radius:999px}
+    label{display:block;font-size:.84rem;color:var(--muted);margin-bottom:5px}
+    input,select,textarea{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line);font-size:1rem;background:white;color:var(--text)}
+    textarea{min-height:72px;resize:vertical}.field{margin-bottom:10px}
+    button{border:0;border-radius:13px;padding:12px 14px;font-size:.98rem;font-weight:750;background:var(--green);color:white;cursor:pointer;width:100%}
+    button.secondary{background:#eef2f7;color:var(--text);border:1px solid var(--line)} button.orange{background:var(--orange)} button.red{background:var(--red)}
+    .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.btn-row.three{grid-template-columns:1fr 1fr 1fr}
+    .pill-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}.pill{flex:0 0 auto;background:var(--soft);color:var(--green-dark);border:1px solid #cdebd8;border-radius:999px;padding:8px 11px;font-size:.83rem;font-weight:750}
+    .exercise-list{display:grid;gap:8px;margin-top:10px}.exercise{border:1px solid var(--line);border-radius:14px;padding:10px;background:#fafafa}
+    .exercise-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px}.exercise-title{font-weight:850}.mini{font-size:.82rem;color:var(--muted)}
+    .series{font-size:1.05rem;font-weight:850;color:var(--green-dark);background:var(--soft);padding:7px 9px;border-radius:10px;display:inline-block}
+    .history-item{border-bottom:1px solid var(--line);padding:10px 0}.history-item:last-child{border-bottom:0}.history-title{font-weight:850}.muted{color:var(--muted)}
+    details{border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:#fafafa;margin-top:8px} summary{font-weight:850;cursor:pointer}
+    .food-table{width:100%;border-collapse:collapse;font-size:.88rem;margin-top:8px}.food-table th,.food-table td{border-bottom:1px solid var(--line);padding:7px 4px;text-align:left}
+    .quick-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .footer-nav{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.97);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);max-width:900px;margin:0 auto;box-shadow:0 -8px 20px rgba(15,23,42,.06)}
+    .footer-nav button{background:transparent;color:var(--muted);border-radius:0;padding:12px 4px;font-size:.82rem}.footer-nav button.active{color:var(--green);background:var(--soft)}
+    .screen{display:none}.screen.active{display:block}
+    @media(min-width:720px){.grid{grid-template-columns:repeat(4,1fr)}.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}}
+  </style>
+</head>
+<body>
+<header>
+  <h1>Akim Fit Tracker</h1>
+  <p>Objectif 80 kg · tractions · bras · natation · nutrition</p>
+</header>
+
+<main>
+<section id="dashboard" class="screen active">
+  <div class="card">
+    <h2>Tableau de bord</h2>
+    <div class="grid">
+      <div class="stat"><div class="label">Poids actuel</div><div class="value" id="statWeight">84.8 kg</div></div>
+      <div class="stat"><div class="label">Objectif</div><div class="value">80.0 kg</div></div>
+      <div class="stat"><div class="label">Jours restants</div><div class="value" id="statDays">28</div></div>
+      <div class="stat"><div class="label">Progression</div><div class="value" id="statProgress">0%</div></div>
+    </div>
+    <div class="progress-wrap"><div id="weightProgress" class="progress-bar"></div></div>
+    <p class="mini" id="weightHint"></p>
+  </div>
+
+  <div class="card">
+    <h2>Compteurs</h2>
+    <div class="grid">
+      <div class="stat"><div class="label">Tractions</div><div class="value" id="totalPullups">0</div></div>
+      <div class="stat"><div class="label">Pompes</div><div class="value" id="totalPushups">0</div></div>
+      <div class="stat"><div class="label">Séances</div><div class="value" id="totalSessions">0</div></div>
+      <div class="stat"><div class="label">Exercices</div><div class="value" id="totalExercises">0</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Ajout rapide</h2>
+    <div class="quick-buttons">
+      <button onclick="quickPushups(20)">+20 pompes</button>
+      <button onclick="quickExercise('corde', '5min')">+5 min corde</button>
+      <button onclick="showScreen('session')">Séance</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Séance du jour</h2>
+    <div id="todayPlan"></div>
+    <div class="btn-row">
+      <button onclick="showScreen('session')">Saisir</button>
+      <button class="secondary" onclick="shiftTodayPlan()">Décaler</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Dernières entrées</h2>
+    <div id="recentEntries"></div>
+  </div>
+</section>
+
+<section id="daily" class="screen">
+  <div class="card">
+    <h2>Saisie quotidienne</h2>
+    <div class="two-col">
+      <div class="field"><label>Poids du jour (kg)</label><input id="dailyWeight" type="number" step="0.1" placeholder="84.8"></div>
+      <div class="field"><label>Calories estimées</label><input id="dailyCalories" type="number" placeholder="1700"></div>
+      <div class="field"><label>Protéines estimées (g)</label><input id="dailyProtein" type="number" placeholder="150"></div>
+      <div class="field"><label>Sommeil (heures)</label><input id="dailySleep" type="number" step="0.5" placeholder="7.5"></div>
+      <div class="field"><label>Énergie (1 à 5)</label><input id="dailyEnergy" type="number" min="1" max="5" placeholder="4"></div>
+      <div class="field"><label>Fatigue articulaire (1 à 5)</label><input id="dailyJoint" type="number" min="1" max="5" placeholder="2"></div>
+    </div>
+    <div class="field"><label>Commentaire</label><textarea id="dailyComment" placeholder="Ressenti, faim, fatigue, motivation..."></textarea></div>
+    <button onclick="saveDaily()">Enregistrer la journée</button>
+  </div>
+
+  <div class="card">
+    <h2>Repères simples</h2>
+    <p class="mini">Cible : 1700 à 1900 kcal/jour · protéines : environ 150 g/jour · jeûne 18/6.</p>
+    <table class="food-table">
+      <tr><th>Aliment</th><th>Calories</th><th>Protéines</th></tr>
+      <tr><td>Poulet 100 g</td><td>≈165</td><td>31 g</td></tr>
+      <tr><td>2 œufs</td><td>≈140</td><td>12 g</td></tr>
+      <tr><td>Fromage blanc 250 g</td><td>≈180</td><td>20 g</td></tr>
+      <tr><td>Riz cuit 100 g</td><td>≈130</td><td>3 g</td></tr>
+      <tr><td>Banane</td><td>≈90</td><td>1 g</td></tr>
+      <tr><td>Huile 1 c. soupe</td><td>≈90</td><td>0 g</td></tr>
+    </table>
+  </div>
+</section>
+
+<section id="session" class="screen">
+  <div class="card">
+    <h2>Enregistrer une séance</h2>
+    <div class="field"><label>Type de séance</label>
+      <select id="sessionType" onchange="loadPresetSession()">
+        <option value="today">Séance du jour</option>
+        <option value="pullups">Tractions + biceps</option>
+        <option value="triceps">Triceps poids de corps</option>
+        <option value="legs">Jambes + gainage</option>
+        <option value="swim">Natation</option>
+        <option value="free">Séance libre</option>
+      </select>
+    </div>
+    <div id="exerciseInputs" class="exercise-list"></div>
+    <div class="field"><label>Commentaire séance</label><textarea id="sessionComment" placeholder="Ressenti, difficulté, douleurs éventuelles..."></textarea></div>
+    <button onclick="saveSession()">Valider la séance</button>
+  </div>
+
+  <div class="card">
+    <h2>Progressions en vague</h2>
+    <p class="mini">Moyen → pic → maîtrisé → maîtrisé → finish.</p>
+    <details open><summary>Biceps curl 12 kg</summary><div id="bicepsLevels"></div></details>
+    <details><summary>Dips</summary><div id="dipsLevels"></div></details>
+    <details><summary>Pompes serrées</summary><div id="closePushupsLevels"></div></details>
+  </div>
+</section>
+
+<section id="history" class="screen">
+  <div class="card">
+    <h2>Historique et sauvegarde</h2>
+    <div class="btn-row">
+      <button class="secondary" onclick="exportData()">Exporter JSON</button>
+      <button class="secondary" onclick="document.getElementById('importFile').click()">Importer JSON</button>
+    </div>
+    <input id="importFile" type="file" accept=".json" style="display:none" onchange="importData(event)">
+    <div id="historyList"></div>
+  </div>
+  <div class="card">
+    <h2>Réinitialisation</h2>
+    <button class="red" onclick="resetAll()">Effacer toutes les données</button>
+  </div>
+</section>
+</main>
+
+<nav class="footer-nav">
+  <button id="nav-dashboard" class="active" onclick="showScreen('dashboard')">Accueil</button>
+  <button id="nav-daily" onclick="showScreen('daily')">Jour</button>
+  <button id="nav-session" onclick="showScreen('session')">Séance</button>
+  <button id="nav-history" onclick="showScreen('history')">Historique</button>
+</nav>
+
+<script>
+const START_WEIGHT=84.8, TARGET_WEIGHT=80.0, PROGRAM_DAYS=28;
+const START_DATE=new Date().toISOString().slice(0,10);
+const defaultData={startDate:START_DATE,startWeight:START_WEIGHT,targetWeight:TARGET_WEIGHT,daily:[],sessions:[],shiftedPlans:{},pullupRestHours:48};
+let data=loadData();
+
+const weeklyPlan={1:["tractions","biceps","natation"],2:["jambes","gainage","pompes"],3:["tractions","biceps","corde"],4:["triceps","jambes","gainage"],5:["tractions","biceps","natation"],6:["corde","abdos","marche/cardio"],0:["repos actif","mobilité","marche douce"]};
+const progressions={
+  biceps:[[8,10,7,7,9],[9,11,8,8,10],[10,12,9,9,11],[11,13,10,10,12],[12,14,11,11,13],[13,15,12,12,14]],
+  dips:[[6,8,5,5,7],[8,10,6,6,9],[10,12,8,8,11],[12,15,10,10,13],[15,18,12,12,16]],
+  closePushups:[[8,10,7,7,9],[10,12,8,8,11],[12,15,10,10,13],[15,18,12,12,16],[18,22,15,15,20]]
+};
+function loadData(){try{return {...structuredClone(defaultData),...JSON.parse(localStorage.getItem("akimFitTrackerV2")||"{}")}}catch(e){return structuredClone(defaultData)}}
+function saveData(){localStorage.setItem("akimFitTrackerV2",JSON.stringify(data));render()}
+function today(){return new Date().toISOString().slice(0,10)}
+function formatDate(d){return new Date(d+"T12:00:00").toLocaleDateString("fr-FR",{weekday:"short",day:"2-digit",month:"2-digit"})}
+function dayDiff(a,b){return Math.floor((new Date(b)-new Date(a))/86400000)}
+function currentWeight(){const last=[...data.daily].reverse().find(x=>x.weight);return last?Number(last.weight):data.startWeight}
+function todayPlan(){return data.shiftedPlans[today()]||weeklyPlan[new Date().getDay()]}
+function showScreen(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll(".footer-nav button").forEach(b=>b.classList.remove("active"));document.getElementById("nav-"+id).classList.add("active");if(id==="session")loadPresetSession();render()}
+function render(){renderDashboard();renderProgressions();renderHistory()}
+function renderDashboard(){
+  const w=currentWeight(), lost=data.startWeight-w, toLose=data.startWeight-data.targetWeight, pct=Math.max(0,Math.min(100,Math.round(lost/toLose*100)));
+  const daysLeft=Math.max(0,PROGRAM_DAYS-dayDiff(data.startDate,today()));
+  statWeight.textContent=w.toFixed(1)+" kg"; statDays.textContent=daysLeft; statProgress.textContent=pct+"%"; weightProgress.style.width=pct+"%";
+  weightHint.textContent=`Départ ${data.startWeight} kg → objectif ${data.targetWeight} kg. Reste ${(w-data.targetWeight).toFixed(1)} kg.`;
+  let pull=0,push=0,exs=0;
+  data.sessions.forEach(s=>s.exercises.forEach(ex=>{exs++; const t=Number(ex.total||0); const n=ex.name.toLowerCase(); if(n.includes("traction"))pull+=t; if(n.includes("pompe"))push+=t;}));
+  totalPullups.textContent=pull; totalPushups.textContent=push; totalSessions.textContent=data.sessions.length; totalExercises.textContent=exs;
+  todayPlanEl=document.getElementById("todayPlan");
+  todayPlanEl.innerHTML=`<div class="pill-row">${todayPlan().map(x=>`<span class="pill">${x}</span>`).join("")}</div><p class="mini">Séance modifiable ou décalable selon ton planning.</p>`;
+  const recent=[...data.daily.map(x=>({type:"Jour",...x})),...data.sessions.map(x=>({type:"Séance",...x}))].sort((a,b)=>(b.date||"").localeCompare(a.date||"")).slice(0,5);
+  recentEntries.innerHTML=recent.length?recent.map(x=>`<div class="history-item"><div class="history-title">${formatDate(x.date)} · ${x.type}</div><div class="mini">${x.type==="Jour"?`${x.weight||"-"} kg · ${x.calories||"-"} kcal · ${x.protein||"-"} g protéines`:`${x.title||"Séance"} · ${x.exercises?.length||0} exercices`}</div></div>`).join(""):`<p class="mini">Aucune entrée.</p>`;
+}
+function renderProgressions(){renderLevels("bicepsLevels",progressions.biceps);renderLevels("dipsLevels",progressions.dips);renderLevels("closePushupsLevels",progressions.closePushups)}
+function renderLevels(id,levels){const el=document.getElementById(id); if(!el)return; el.innerHTML=levels.map((l,i)=>`<div class="exercise"><div class="exercise-head"><span class="exercise-title">Niveau ${i+1}</span><span class="series">${l.join(" - ")}</span></div></div>`).join("")}
+function loadPresetSession(){
+  const type=sessionType.value; let names=[];
+  if(type==="today")names=todayPlan(); if(type==="pullups")names=["tractions","biceps"]; if(type==="triceps")names=["dips","pompes serrées"]; if(type==="legs")names=["squats","fentes","ponts fessiers","gainage"]; if(type==="swim")names=["natation"]; if(type==="free")names=["exercice libre"];
+  exerciseInputs.innerHTML=names.map((name,idx)=>exerciseInput(name,idx)).join("");
+}
+function exerciseInput(name,idx){
+  const n=name.toLowerCase(); let preset="";
+  if(n.includes("biceps"))preset=progressions.biceps[2].join("-"); if(n.includes("dips"))preset=progressions.dips[1].join("-"); if(n.includes("serr"))preset=progressions.closePushups[1].join("-");
+  if(n.includes("traction"))preset="11-15-10-10-13"; if(n==="pompes")preset="20-20-20-20-20"; if(n.includes("squat"))preset="20-20-20"; if(n.includes("fente"))preset="12-12-12"; if(n.includes("gainage"))preset="45s-45s-45s"; if(n.includes("corde"))preset="5min"; if(n.includes("natation"))preset="1km";
+  return `<div class="exercise"><div class="exercise-head"><input class="ex-name" value="${name}"></div><div class="field"><label>Séries / reps / durée</label><input class="ex-series" value="${preset}" placeholder="ex: 11-15-10-10-13 ou 1km"></div><div class="field"><label>Charge éventuelle</label><input class="ex-load" value="${n.includes("biceps")?"12 kg par bras":""}" placeholder="ex: élastique, 12 kg"></div><div class="field"><label>Commentaire</label><input class="ex-comment" placeholder="facile, dur, RAS..."></div></div>`;
+}
+function parseTotal(series){if(!series)return 0; if(/km|min|s/i.test(series))return 0; const nums=series.match(/\d+(\.\d+)?/g); return nums?nums.map(Number).reduce((a,b)=>a+b,0):0}
+function saveDaily(){
+  const entry={id:crypto.randomUUID(),date:today(),weight:Number(dailyWeight.value)||"",calories:Number(dailyCalories.value)||"",protein:Number(dailyProtein.value)||"",sleep:Number(dailySleep.value)||"",energy:Number(dailyEnergy.value)||"",jointFatigue:Number(dailyJoint.value)||"",comment:dailyComment.value||""};
+  data.daily=data.daily.filter(x=>x.date!==entry.date); data.daily.push(entry); saveData();
+  ["dailyWeight","dailyCalories","dailyProtein","dailySleep","dailyEnergy","dailyJoint","dailyComment"].forEach(id=>document.getElementById(id).value=""); showScreen("dashboard");
+}
+function saveSession(){
+  const exercises=[...document.querySelectorAll("#exerciseInputs .exercise")].map(box=>{const name=box.querySelector(".ex-name").value.trim(), series=box.querySelector(".ex-series").value.trim(); return {name,series,load:box.querySelector(".ex-load").value.trim(),comment:box.querySelector(".ex-comment").value.trim(),total:parseTotal(series)}}).filter(x=>x.name);
+  data.sessions.push({id:crypto.randomUUID(),date:today(),title:sessionType.selectedOptions[0].textContent,exercises,comment:sessionComment.value||""}); saveData(); sessionComment.value=""; showScreen("dashboard");
+}
+function quickPushups(n){data.sessions.push({id:crypto.randomUUID(),date:today(),title:"Ajout rapide pompes",exercises:[{name:"pompes",series:String(n),load:"",comment:"ajout rapide",total:n}],comment:""});saveData()}
+function quickExercise(name,series){data.sessions.push({id:crypto.randomUUID(),date:today(),title:"Ajout rapide",exercises:[{name,series,load:"",comment:"ajout rapide",total:parseTotal(series)}],comment:""});saveData()}
+function shiftTodayPlan(){const d=new Date(); d.setDate(d.getDate()+1); data.shiftedPlans[d.toISOString().slice(0,10)]=todayPlan(); saveData(); alert("Séance décalée à demain.")}
+function renderHistory(){
+  const all=[...data.daily.map(x=>({kind:"Jour",...x})),...data.sessions.map(x=>({kind:"Séance",...x}))].sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+  historyList.innerHTML=all.length?all.map(x=>`<div class="history-item"><div class="history-title">${formatDate(x.date)} · ${x.kind}</div><div class="mini">${x.kind==="Jour"?`${x.weight||"-"} kg · ${x.calories||"-"} kcal · ${x.protein||"-"} g protéines · sommeil ${x.sleep||"-"} h`:`${x.title} · ${x.exercises.map(e=>`${e.name}: ${e.series}`).join(" · ")}`}</div>${x.comment?`<p class="mini">${x.comment}</p>`:""}<button class="secondary" style="margin-top:8px" onclick="deleteEntry('${x.kind}','${x.id}')">Supprimer</button></div>`).join(""):`<p class="mini">Aucun historique.</p>`;
+}
+function deleteEntry(kind,id){if(!confirm("Supprimer cette entrée ?"))return; if(kind==="Jour")data.daily=data.daily.filter(x=>x.id!==id); if(kind==="Séance")data.sessions=data.sessions.filter(x=>x.id!==id); saveData()}
+function exportData(){const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="akim-fit-tracker-sauvegarde.json";a.click();URL.revokeObjectURL(url)}
+function importData(e){const file=e.target.files[0]; if(!file)return; const r=new FileReader(); r.onload=ev=>{try{data={...structuredClone(defaultData),...JSON.parse(ev.target.result)};saveData();alert("Données importées.")}catch(err){alert("Fichier invalide.")}}; r.readAsText(file)}
+function resetAll(){if(!confirm("Tout effacer ? Exporte avant si besoin."))return;localStorage.removeItem("akimFitTrackerV2");data=structuredClone(defaultData);render()}
+if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(()=>{})}
+loadPresetSession(); render();
+</script>
+</body>
+</html>
